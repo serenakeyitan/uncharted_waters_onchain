@@ -1,0 +1,72 @@
+.resource-legend {
+  position: fixed;
+  top: 0;
+  left: -300px; /* Initially hidden off-screen to the left */
+  width: 300px; /* Width of the legend */
+  height: 100%;
+  background-color: #001f33; /* Updated dark blue background color */
+  color: #fff; /* White text color */
+  transition: left 0.3s ease-in-out; /* Smooth slide animation */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Add shadow to the legend */
+}
+
+.resource-legend.show {
+  left: 0; /* Show the legend by moving it to the left */
+}
+
+.legend-toggle-button {
+  margin: 20px;
+  background-color: #ffde00; /* Yellow background for the button */
+  color: #001f33; /* Updated dark blue text color for the button */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.legend-toggle-button:hover {
+  background-color: #ffd600; /* Lighter yellow on hover */
+}
+
+.legend-content {
+  display: inline-block; /* Makes the div as wide as its contents */
+}
+
+/* Style the table header */
+table th {
+  background-color: #0077be; /* Blue background for table headers */
+  color: #fff; /* White text color for table headers */
+  padding: 10px;
+}
+
+/* Style the table rows */
+table td {
+  background-color: #001f33; /* Updated dark blue background for table rows */
+  color: #fff; /* White text color for table rows */
+  padding: 10px;
+}
+
+.hide-button {
+  display: none; /* Hide the button when this class is applied */
+}
+
+
+
+
+/* Add any other styles you need */
+.toggle-button {
+  position: fixed;
+  bottom: 50px;
+  left: 10px;
+  z-index: 1;
+  font-size: 18px;
+}
+
+.resource-table {
+  position: fixed;
+  bottom: 100px;
+  left: 10px;
+  z-index: 1;
+}

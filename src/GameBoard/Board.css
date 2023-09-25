@@ -1,0 +1,104 @@
+
+
+/* Style for the entire game board container */
+.game-board {
+    background-color: #17202A; /* Dark background color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    padding-top: 50px; /* Add some top padding to move the board down */
+    margin-top: 500px; /* Adjust this value to move the board down as much as you like */
+
+    
+  }
+  
+  /* Style for individual hexagon cells */
+  .cell {
+    width: 50px;
+    height: 58px; /* Adjust the height for your hexagons */
+    margin: 0 2px; /* Adjust margin as needed */
+    background-color: #3498DB; /* Default cell color */
+    position: relative;
+    
+  }
+
+  body {
+    background-color: #17202A; /* Your chosen dark background color */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+  }
+  
+  /* Style for different resources */
+  .cell[data-resource="Wood"] {
+    background-color: #8B4513; /* Brown */
+  }
+  
+  .cell[data-resource="Stone"] {
+    background-color: #808080; /* Gray */
+  }
+  
+  .cell[data-resource="Cotton"] {
+    background-color: #FFD700; /* Gold */
+  }
+  
+  .cell[data-resource="Iron"] {
+    background-color: #D3D3D3; /* Light Gray */
+  }
+  
+  .cell[data-resource="Coal"] {
+    background-color: #000000; /* Black */
+  }
+  
+  .cell[data-resource="Copper"] {
+    background-color: #FFA500; /* Copper */
+  }
+  
+  .cell[data-resource="Uranium"] {
+    background-color: #00FF00; /* Green */
+  }
+  
+  /* Style for the popup window */
+  .popup {
+    position: fixed;
+    padding: 10px;
+    background-color: #FFF;
+    border: 1px solid #000;
+    z-index: 1000;
+  }
+
+  .cell.selected {
+    stroke: #ff0000;  /* Red outline */
+    stroke-width: 2; /* Width of the outline */
+  }
+
+
+  .player-info {
+    background-color: #f4e9d8;
+    border-radius: 5px;
+    padding: 10px;
+    font-family: "Times New Roman", Times, serif;
+  }
+  
+  .balance-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  .balance-container p {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .balance-green {
+    color: #006400;
+  }
+  
+  .balance-red {
+    color: #8b0000;
+  }
+  
+
+  
