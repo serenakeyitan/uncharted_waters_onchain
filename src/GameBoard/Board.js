@@ -13,8 +13,10 @@ const aggregateResources = (islandResources) => {
         if (resourceType !== 'null' && resourceType !== 'Empty Grid' && resourceType !== 'undefined') {
           if (!resourceAmounts[resourceType]) {
             resourceAmounts[resourceType] = 0;
+            
           }
           resourceAmounts[resourceType] += island[resourceType];
+          
         }
       }
     }
@@ -28,8 +30,12 @@ const Board = ({ board, islandResources }) => {
   
   const [hoveredIsland, setHoveredIsland] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-  const [resourceAmounts, setResourceAmounts] = useState({});
+  const [resourceAmounts, setResourceAmounts] = useState(islandResources || {});
+  console.log(islandResources, resourceAmounts);
+  console.log('Initial resourceAmounts:', resourceAmounts);
   const [player, setPlayer] = useState({ id: 1, balance: 1000, inventory: {} });
+  const [selectedCell, setSelectedCell] = useState(null);
+
 
 
   // const handleIslandClick = (cell) => {
@@ -85,6 +91,10 @@ const Board = ({ board, islandResources }) => {
   
   const [islandOwnership, setIslandOwnership] = useState({});
   const [selectedIsland, setSelectedIsland] = useState(null);
+
+  useEffect(() => {
+    console.log('selectedIsland changed:', selectedIsland);
+  }, [selectedIsland]);
 
   const stakeIsland = () => {
     if (selectedIsland !== null && player.balance >= 100 && !islandOwnership[selectedIsland]) {
@@ -148,6 +158,96 @@ const Board = ({ board, islandResources }) => {
     setHoveredIsland(null);
   };
 
+  const [showMinePopup, setShowMinePopup] = useState(false);
+
+  const handleRightClick = (e, cell) => {
+    e.preventDefault(); // Prevent the default context menu from appearing
+  
+    console.log("Right-clicked on cell:", cell);
+  
+    if (cell !== 'Sea') {
+      console.log("Cell is not sea");
+  
+      if (islandOwnership[cell.islandId] === player.id) {
+        console.log("Island is owned by the player");
+  
+        const islandResource = islandResources[cell.islandId];
+        if (islandResource && islandResource[cell.resource] > 0) {
+          console.log("Setting showMinePopup to true"); // New debug line
+          setShowMinePopup(true);
+          setPopupPosition({ x: e.clientX, y: e.clientY });
+          setHoveredIsland(cell);
+        }
+      }
+    }
+  };
+
+// Debug for mining issue
+console.log('Selected Island:', selectedIsland);
+console.log('Resource Amounts:', resourceAmounts);
+
+const mineResource = (cell) => {
+  console.log('mining resource for cell:', cell);
+  console.log('current selectedIsland:', selectedIsland);
+
+  setResourceAmounts((prevResources) => {
+      const updatedResources = { ...prevResources };
+      if (!updatedResources[selectedIsland] || !updatedResources[selectedIsland][cell.resource]) {
+        console.error(`Error: ${selectedIsland} or ${cell.resource} not found!`);
+        return prevResources;  // Return the previous state to prevent breaking.
+      }
+      updatedResources[selectedIsland][cell.resource] -= 1;
+      return updatedResources;
+  });
+
+  // Update player inventory
+  setPlayer((prevState) => {
+      const updatedInventory = { ...prevState.inventory };
+      if (!updatedInventory[cell.resource]) {
+          updatedInventory[cell.resource] = 0;
+      }
+      updatedInventory[cell.resource] += 1;
+      return { ...prevState, inventory: updatedInventory };
+  });
+
+  if (!cell.islandId || !cell.resource) {
+    console.error("Either islandId or resource from cell is missing");
+    return;
+  }
+  if (!islandResources || !islandResources[cell.islandId]) {
+    console.error("islandResources or islandResources for specific islandId is undefined");
+    return;
+  }
+  if (islandResources[cell.islandId][cell.resource] === undefined) {
+    console.error(`Resource ${cell.resource} doesn't exist for islandId: ${cell.islandId}`);
+    return;
+  }
+
+  setResourceAmounts((prevResources) => {
+    const updatedResources = { ...prevResources };
+
+    // Ensure that the island exists in updatedResources
+    if (!updatedResources[cell.islandId]) {
+      console.error(`Island with id ${cell.islandId} does not exist in resources`);
+      return prevResources;
+    }
+
+    // Ensure that the resource exists for the island in updatedResources
+    if (!updatedResources[cell.islandId][cell.resource]) {
+      console.error(`Resource ${cell.resource} does not exist for island ${cell.islandId}`);
+      return prevResources;
+    }
+
+    updatedResources[cell.islandId][cell.resource] -= 1;
+
+    return updatedResources;
+  });
+};
+
+// debug ownership of island
+console.log('Island Ownership in Parent:', islandOwnership);
+
+
   
 
   return (
@@ -194,6 +294,7 @@ const Board = ({ board, islandResources }) => {
               key={`${i}-${j}`}
               className={`cell ${isSelected ? 'selected' : ''}`}
               onClick={() => handleIslandClick(cell)}
+              onContextMenu={(e) => handleRightClick(e, cell)}
               onMouseEnter={(e) => handleMouseEnter(cell, e)}
               onMouseLeave={handleMouseLeave}
             >
@@ -202,11 +303,29 @@ const Board = ({ board, islandResources }) => {
           );
         }))}
        </svg>
+
+
+      {showMinePopup && (
+        <ResourcePopup 
+          position={popupPosition} 
+          onClose={() => setShowMinePopup(false)}
+        >
+          <button onClick={() => {
+            mineResource(selectedCell);
+            setShowMinePopup(false);  // Close the popup after mining
+          }}>
+            Mine
+          </button>
+        </ResourcePopup>
+      )}
+
       <ResourcePopup 
         hoveredIsland={hoveredIsland} 
         popupPosition={popupPosition} 
         islandOwnership={islandOwnership} 
-        />
+        mineResource={mineResource}
+        show={showMinePopup}
+      />
     </div>
   );
 };
