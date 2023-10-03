@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './Board.css';
 import ResourcePopup from './ResourcePopup';
 import ResourceLegend from './ResourceLegend';  // Import ResourceLegend
+import { startMining, stopMining } from './mining';
 
 const aggregateResources = (islandResources) => {
+
+  console.log("Current islandResources:", islandResources);
+  
   const resourceAmounts = {};
 
   for (const islandId in islandResources) {
@@ -48,6 +52,8 @@ const Board = ({ board, islandResources }) => {
 
   // Recalculate the resourceAmounts whenever islandResources change
   useEffect(() => {
+
+
     const newResourceAmounts = aggregateResources(islandResources);
     console.log("New resource amounts:", newResourceAmounts);
     setResourceAmounts(aggregateResources(islandResources));
@@ -182,7 +188,11 @@ console.log('Resource Amounts:', resourceAmounts);
 const mineResource = (cell) => {
   console.log('mining resource for cell:', cell);
   console.log('current selectedIsland:', selectedIsland);
-
+  if (!islandResources[cell.islandId]) {
+    console.error(`Island with id ${cell.islandId} does not exist in resources`);
+    return;
+  }
+  
   setResourceAmounts((prevResources) => {
       const updatedResources = { ...prevResources };
       if (!updatedResources[selectedIsland] || !updatedResources[selectedIsland][cell.resource]) {
