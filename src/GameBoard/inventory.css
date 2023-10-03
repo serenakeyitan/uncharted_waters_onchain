@@ -1,0 +1,32 @@
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 40px); /* 9 columns for Minecraft's inventory row */
+    gap: 5px;
+    padding: 10px;
+    background-color: #2C2C2C;
+    border: 2px solid #464646;
+    width: fit-content;
+  }
+  
+  .slot {
+    width: 40px;
+    height: 40px;
+    background-color: #3A3A3A;
+    border: 1px solid #464646;
+    position: relative;
+  }
+  
+  .slot img {
+    width: 32px;
+    height: 32px;
+    margin: 4px;
+  }
+  
+  .slot-count {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    color: white;
+    font-weight: bold;
+  }
+  

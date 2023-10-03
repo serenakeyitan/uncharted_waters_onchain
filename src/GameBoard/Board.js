@@ -2,24 +2,32 @@ import React, { useState, useEffect } from 'react';
 import './Board.css';
 import ResourcePopup from './ResourcePopup';
 import ResourceLegend from './ResourceLegend';  // Import ResourceLegend
-import { startMining, stopMining } from './mining';
+import { useMining } from './mining.js';
+import PlayerInventory from './playerInventory';
+
+
 
 const aggregateResources = (islandResources) => {
 
   console.log("Current islandResources:", islandResources);
-  
+
   const resourceAmounts = {};
 
   for (const islandId in islandResources) {
     const island = islandResources[islandId];
     if (island) {
+      console.log(`Processing islandId ${islandId}`);
       for (const resourceType in island) {
         if (resourceType !== 'null' && resourceType !== 'Empty Grid' && resourceType !== 'undefined') {
           if (!resourceAmounts[resourceType]) {
             resourceAmounts[resourceType] = 0;
             
           }
-          resourceAmounts[resourceType] += island[resourceType];
+          if (typeof island[resourceType] === "number") {
+            resourceAmounts[resourceType] += island[resourceType];
+          } else {
+            console.error(`Invalid value for resourceType ${resourceType} in island ${islandId}:`, island[resourceType]);
+          }
           
         }
       }
@@ -48,12 +56,18 @@ const Board = ({ board, islandResources }) => {
   //     stakeIsland(cell.islandId);  // Automatically stake after selecting the island
   //   }
   // };
-  
+  console.log("islandResource:", islandResources);
+
+  const {
+    resourceAmounts: minedResourceAmounts,
+    setResourceAmounts: setMinedResourceAmounts,
+    startMining,
+    stopMining,
+    mineResource: mineUsingHook  // Rename the function from the hook
+  } = useMining(islandResources);
 
   // Recalculate the resourceAmounts whenever islandResources change
   useEffect(() => {
-
-
     const newResourceAmounts = aggregateResources(islandResources);
     console.log("New resource amounts:", newResourceAmounts);
     setResourceAmounts(aggregateResources(islandResources));
@@ -72,16 +86,6 @@ const Board = ({ board, islandResources }) => {
     // if (cell === 'Sea') return 'blue';
     if (cell === 'Sea') return '#0077be'; // Blue for sea
     if (cell.type === 'Empty Grid') return '#FFFFFF';
-    // switch (cell.resource) {
-    //   case 'Wood': return '#5E2C04';
-    //   case 'Stone': return '#808080';
-    //   case 'Cotton': return '#F4F186';
-    //   case 'Iron': return '#D3D3D3';
-    //   case 'Coal': return '#000000';
-    //   case 'Copper': return '#D2691E';
-    //   case 'Uranium': return '#ADFF2F';
-    //   default: return 'brown';
-    // }
     switch (cell.resource) {
         case 'Wood': return '#8B4513'; // Brown for Wood
         case 'Stone': return '#808080'; // Gray for Stone
@@ -101,6 +105,8 @@ const Board = ({ board, islandResources }) => {
   useEffect(() => {
     console.log('selectedIsland changed:', selectedIsland);
   }, [selectedIsland]);
+  
+
 
   const stakeIsland = () => {
     if (selectedIsland !== null && player.balance >= 100 && !islandOwnership[selectedIsland]) {
@@ -147,6 +153,7 @@ const Board = ({ board, islandResources }) => {
         setPopupPosition({ x: event.clientX, y: event.clientY });
       } else {
         console.error(`No island resource found for islandId: ${cell.islandId}`);
+        console.log('Current state of islandResources:', islandResources); // Log the current state
       }
     } else {
       console.error("cell or islandId or islandResources is undefined");
@@ -185,47 +192,48 @@ const Board = ({ board, islandResources }) => {
 console.log('Selected Island:', selectedIsland);
 console.log('Resource Amounts:', resourceAmounts);
 
+
 const mineResource = (cell) => {
   console.log('mining resource for cell:', cell);
   console.log('current selectedIsland:', selectedIsland);
-  if (!islandResources[cell.islandId]) {
-    console.error(`Island with id ${cell.islandId} does not exist in resources`);
+
+  // Check if the islandResources exist and if the specific islandId is defined in it
+  if (!islandResources) {
+    console.error("islandResources is undefined");
     return;
   }
-  
-  setResourceAmounts((prevResources) => {
-      const updatedResources = { ...prevResources };
-      if (!updatedResources[selectedIsland] || !updatedResources[selectedIsland][cell.resource]) {
-        console.error(`Error: ${selectedIsland} or ${cell.resource} not found!`);
-        return prevResources;  // Return the previous state to prevent breaking.
-      }
-      updatedResources[selectedIsland][cell.resource] -= 1;
-      return updatedResources;
-  });
 
-  // Update player inventory
-  setPlayer((prevState) => {
-      const updatedInventory = { ...prevState.inventory };
-      if (!updatedInventory[cell.resource]) {
-          updatedInventory[cell.resource] = 0;
-      }
-      updatedInventory[cell.resource] += 1;
-      return { ...prevState, inventory: updatedInventory };
-  });
+  if (!islandResources[cell.islandId]) {
+    console.error(`islandResources for specific islandId ${cell.islandId} is undefined`);
+    console.log('Current state of islandResources:', islandResources); // Log the current state
+    return;
+  }
 
+  // Check if the islandId and resource from the cell are valid
   if (!cell.islandId || !cell.resource) {
     console.error("Either islandId or resource from cell is missing");
     return;
   }
+
+  // Check if the islandResources exist and if the specific islandId is defined in it
   if (!islandResources || !islandResources[cell.islandId]) {
     console.error("islandResources or islandResources for specific islandId is undefined");
     return;
   }
+
+  // Check if the resource exists for the specific islandId in islandResources
   if (islandResources[cell.islandId][cell.resource] === undefined) {
     console.error(`Resource ${cell.resource} doesn't exist for islandId: ${cell.islandId}`);
     return;
   }
 
+  if (!islandResources[cell.islandId]) {
+    console.error(`Island with id ${cell.islandId} does not exist in resources. Current state of islandResources:`, islandResources);
+    return;
+  }
+  
+
+  // Update the resources
   setResourceAmounts((prevResources) => {
     const updatedResources = { ...prevResources };
 
@@ -234,6 +242,7 @@ const mineResource = (cell) => {
       console.error(`Island with id ${cell.islandId} does not exist in resources`);
       return prevResources;
     }
+
 
     // Ensure that the resource exists for the island in updatedResources
     if (!updatedResources[cell.islandId][cell.resource]) {
@@ -245,7 +254,18 @@ const mineResource = (cell) => {
 
     return updatedResources;
   });
+
+  // Update player inventory
+  setPlayer((prevState) => {
+    const updatedInventory = { ...prevState.inventory };
+    if (!updatedInventory[cell.resource]) {
+      updatedInventory[cell.resource] = 0;
+    }
+    updatedInventory[cell.resource] += 1;
+    return { ...prevState, inventory: updatedInventory };
+  });
 };
+
 
 // debug ownership of island
 console.log('Island Ownership in Parent:', islandOwnership);
@@ -305,6 +325,8 @@ console.log('Island Ownership in Parent:', islandOwnership);
             </g>
           );
         }))}
+      {/* place the inventory below the board */}
+      <PlayerInventory inventory={player.inventory} />
        </svg>
 
 
