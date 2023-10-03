@@ -27,7 +27,7 @@ const aggregateResources = (islandResources) => {
 
 
 const Board = ({ board, islandResources }) => {
-  
+
   const [hoveredIsland, setHoveredIsland] = useState(null);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const [resourceAmounts, setResourceAmounts] = useState(islandResources || {});
@@ -162,24 +162,17 @@ const Board = ({ board, islandResources }) => {
 
   const handleRightClick = (e, cell) => {
     e.preventDefault(); // Prevent the default context menu from appearing
-  
-    console.log("Right-clicked on cell:", cell);
-  
-    if (cell !== 'Sea') {
-      console.log("Cell is not sea");
-  
-      if (islandOwnership[cell.islandId] === player.id) {
-        console.log("Island is owned by the player");
-  
-        const islandResource = islandResources[cell.islandId];
-        if (islandResource && islandResource[cell.resource] > 0) {
-          console.log("Setting showMinePopup to true"); // New debug line
-          setShowMinePopup(true);
-          setPopupPosition({ x: e.clientX, y: e.clientY });
-          setHoveredIsland(cell);
-        }
+    // debug: the mine did not show in popupwindow
+    if (cell !== 'Sea' && islandOwnership[cell.islandId] === player.id) {
+      const islandResource = islandResources[cell.islandId];
+      if (islandResource && islandResource[cell.resource] > 0) {
+        const rect = e.target.getBoundingClientRect();
+        setPopupPosition({ x: rect.left + window.scrollX, y: rect.top + window.scrollY }); // Set the position based on the SVG grid's coordinates
+        setSelectedCell(cell); // Set the selected cell to the one that was right-clicked
+        setShowMinePopup(true); // Show the "Mine" button
       }
     }
+    // stop debug: the mine did not show in popupwindow 
   };
 
 // Debug for mining issue
@@ -305,27 +298,33 @@ console.log('Island Ownership in Parent:', islandOwnership);
        </svg>
 
 
-      {showMinePopup && (
-        <ResourcePopup 
-          position={popupPosition} 
-          onClose={() => setShowMinePopup(false)}
-        >
-          <button onClick={() => {
+       {showMinePopup && selectedCell && (
+        <button
+          style={{
+            position: 'absolute',
+            left: `${popupPosition.x}px`,
+            top: `${popupPosition.y}px`,
+            zIndex: 1000
+          }}
+          onClick={() => {
             mineResource(selectedCell);
-            setShowMinePopup(false);  // Close the popup after mining
-          }}>
-            Mine
-          </button>
-        </ResourcePopup>
+            setShowMinePopup(false); // Close the "Mine" button after mining
+          }}
+        >
+          Mine
+        </button>
       )}
 
-      <ResourcePopup 
-        hoveredIsland={hoveredIsland} 
-        popupPosition={popupPosition} 
-        islandOwnership={islandOwnership} 
-        mineResource={mineResource}
-        show={showMinePopup}
-      />
+
+      {hoveredIsland && popupPosition && (
+        <ResourcePopup 
+          hoveredIsland={hoveredIsland} 
+          popupPosition={popupPosition} 
+          islandOwnership={islandOwnership} 
+          // mineResource={mineResource}
+          show={showMinePopup}
+        />
+      )}
     </div>
   );
 };
