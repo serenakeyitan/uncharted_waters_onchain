@@ -1,103 +1,216 @@
-
-
 /* Style for the entire game board container */
 .game-board {
-    background-color: #17202A; /* Dark background color */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    padding-top: 50px; /* Add some top padding to move the board down */
-    margin-top: 500px; /* Adjust this value to move the board down as much as you like */
+  background-color: #17202A;
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  padding-top: 50px;
+  transition: margin-left 0.3s; /* Smooth transition for sliding effect */
+}
 
-    
-  }
-  
-  /* Style for individual hexagon cells */
-  .cell {
-    width: 50px;
-    height: 58px; /* Adjust the height for your hexagons */
-    margin: 0 2px; /* Adjust margin as needed */
-    background-color: #3498DB; /* Default cell color */
-    position: relative;
-    
+/* Style for individual hexagon cells */
+.cell {
+  width: 50px;
+  height: 58px;
+  margin: 0 2px;
+  background-color: #3498DB;
+  position: relative;
+}
+
+body {
+  background-color: #17202A;
+  margin: 0;
+  padding: 0;
+}
+
+/* Style for different resources */
+.cell[data-resource="Wood"] {
+  background-color: #8B4513;
+}
+
+.cell[data-resource="Stone"] {
+  background-color: #808080;
+}
+
+.cell[data-resource="Cotton"] {
+  background-color: #FFD700;
+}
+
+.cell[data-resource="Iron"] {
+  background-color: #D3D3D3;
+}
+
+.cell[data-resource="Coal"] {
+  background-color: #000000;
+}
+
+.cell[data-resource="Copper"] {
+  background-color: #FFA500;
+}
+
+.cell[data-resource="Uranium"] {
+  background-color: #00FF00;
+}
+
+/* Style for the popup window */
+.popup {
+  position: fixed;
+  padding: 10px;
+  background-color: #FFF;
+  border: 1px solid #000;
+  z-index: 1000;
+}
+
+.cell.selected {
+  stroke: #ff0000;
+  stroke-width: 2;
+}
+
+.player-info {
+  background-color: #f4e9d8;
+  border-radius: 5px;
+  padding: 10px;
+  font-family: "Times New Roman", Times, serif;
+}
+
+.balance-container {
+  display: flex;
+  align-items: center;
+}
+
+.balance-container p {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.balance-green {
+  color: #006400;
+}
+
+.balance-red {
+  color: #8b0000;
+}
+
+.game-container {
+  position: relative;
+  display: flex;
+  align-items: start;
+}
+
+.inventory-grid {
+  display: flex;
+  width: 100%;
+  border: 1px solid #ddd;
+  background-color: #2c2c2c; /* Dark background for the inventory */
+}
+
+.slot {
+  flex: 1; /* Distribute space equally among slots */
+  position: relative; /* To position the count absolutely within the slot */
+  height: 50px; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #ddd; /* Add a border between slots */
+}
+
+.slot:last-child {
+  border-right: none; /* Remove border for the last slot */
+}
+
+.slot-count {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  color: #fff; /* White text color */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background for better visibility */
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 8px;
+}
+
+.slot:hover {
+  filter: brightness(0.85); /* Darken the slot on hover */
+  transform: scale(1.05); /* Slightly scale up the slot */
+  transition: filter 0.3s, transform 0.3s; /* Smooth transition for the hover effect */
+}
+
+.slot-count:hover {
+  background-color: rgba(0, 0, 0, 0.7); /* Darken the count's background more on hover */
+}
+
+.resource-name {
+  color: #fff; /* White text color */
+  font-size: 12px;
+}
+
+.slot[data-resource="Wood"] .resource-name {
+  background-color: #8B4513; /* Brown for Wood */
+}
+
+.slot[data-resource="Stone"] .resource-name {
+  background-color: #808080; /* Gray for Stone */
+}
+
+.slot[data-resource="Cotton"] .resource-name {
+  background-color: #FFD700; /* Gold for Cotton */
+}
+
+.slot[data-resource="Iron"] .resource-name {
+  background-color: #D3D3D3; /* Light Gray for Iron */
+}
+
+.slot[data-resource="Coal"] .resource-name {
+  background-color: #000000; /* Black for Coal */
+}
+
+.slot[data-resource="Copper"] .resource-name {
+  background-color: #FFA500; /* Copper for Copper */
+}
+
+.slot[data-resource="Uranium"] .resource-name {
+  background-color: #00FF00; /* Green for Uranium */
+}
+
+.game-container .game-board.sidebar-visible {
+  margin-left: 50px; /* Adjusted to the width of the small bar */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar {
+      width: 250px; /* Slightly reduce the width for smaller screens */
+      padding: 10px; /* Reduce padding for smaller screens */
   }
 
-  body {
-    background-color: #17202A; /* Your chosen dark background color */
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
+  .game-container .game-board.sidebar-visible {
+      margin-left: 40px; /* Adjusted to the reduced width of the small bar */
   }
-  
-  /* Style for different resources */
-  .cell[data-resource="Wood"] {
-    background-color: #8B4513; /* Brown */
-  }
-  
-  .cell[data-resource="Stone"] {
-    background-color: #808080; /* Gray */
-  }
-  
-  .cell[data-resource="Cotton"] {
-    background-color: #FFD700; /* Gold */
-  }
-  
-  .cell[data-resource="Iron"] {
-    background-color: #D3D3D3; /* Light Gray */
-  }
-  
-  .cell[data-resource="Coal"] {
-    background-color: #000000; /* Black */
-  }
-  
-  .cell[data-resource="Copper"] {
-    background-color: #FFA500; /* Copper */
-  }
-  
-  .cell[data-resource="Uranium"] {
-    background-color: #00FF00; /* Green */
-  }
-  
-  /* Style for the popup window */
-  .popup {
-    position: fixed;
-    padding: 10px;
-    background-color: #FFF;
-    border: 1px solid #000;
-    z-index: 1000;
-  }
-
-  .cell.selected {
-    stroke: #ff0000;  /* Red outline */
-    stroke-width: 2; /* Width of the outline */
-  }
+}
 
 
-  .player-info {
-    background-color: #f4e9d8;
-    border-radius: 5px;
-    padding: 10px;
-    font-family: "Times New Roman", Times, serif;
-  }
-  
-  .balance-container {
-    display: flex;
-    align-items: center;
-  }
-  
-  .balance-container p {
-    font-size: 18px;
-    font-weight: bold;
-    margin: 0;
-  }
-  
-  .balance-green {
-    color: #006400;
-  }
-  
-  .balance-red {
-    color: #8b0000;
-  }
-  
-  
+button {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background-color: #3498DB;
+  color: #fff;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
+  border-radius: 5px; /* Rounded corners for the button */
+}
+
+button:hover {
+  background-color: #2980B9;
+}
+
+button:focus {
+  outline: none; /* Remove default focus outline */
+  box-shadow: 0 0 5px #2980B9, 0 2px 5px rgba(0, 0, 0, 0.2); /* Focus shadow */
+}

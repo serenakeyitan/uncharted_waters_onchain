@@ -66,4 +66,8 @@ export const generateIsland = (x, y, advancedResource, board, islandId, newIslan
 
     return emptyGridCount;
   };
+
+
+export const BASE_RESOURCE_AMOUNT = 200;
+export const ADVANCED_RESOURCE_AMOUNT = 100;
   
