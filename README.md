@@ -1,3 +1,6 @@
+It is a proof of concept of Infinite Seas!
+
+
 cd to the folder
 
 run `npm start`
